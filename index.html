@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Card matching</title>
+    <link rel="stylesheet" href="css/startPage.css">
+</head>
+<body>
+    <div id="wrapper">
+        <div id="header"></div>
+        <div id="content">
+            <div id="bastion"></div>
+            <div id="login">
+                <form>
+                    <div class="textInput">
+                        <div class="inputText">
+                            <input type="text" placeholder="name"  id="name">
+                        </div>
+                        <div class="inputText">
+                            <input type="text" placeholder="lastname" id="lastname">
+                        </div>
+                        <div class="inputText">
+                            <input type="email" placeholder="email" id="email">
+                        </div>
+                    </div>
+
+                    <div id="difficultySettings">
+                        <div class="mode">
+                            <label>3 x 2 field
+                                <input type="radio" name="mode" value="1" checked>
+                            </label>
+                        </div>
+                        <div class="mode">
+                            <label>3 x 3 field
+                                <input type="radio" name="mode" value="2">
+                            </label>
+                        </div>
+                        <div class="mode">
+                            <label>3 x 4 field
+                                <input type="radio" name="mode" value="3">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="viewSetting">
+                        <img src="images/card1.jpg" class="card selectedCard">
+                        <img src="images/card2.jpg" class="card">
+                    </div>
+
+                    <input id="goButton" type="button" value="Go!">
+
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script src="js/base.js"></script>

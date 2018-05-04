@@ -1,0 +1,54 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #EADBF0;
+}
+
+#header {
+    text-align: center;
+    font-size: 40px;
+}
+
+#wrapper {
+    margin: auto;
+    max-width: 800px;
+    min-width: 800px;
+    min-height: 500px;
+    background-color: #F3F2C1;
+}
+
+.rulesSheet {
+    margin: 30px 10px;
+    padding: 0 60px;
+    text-indent: 40px;
+}
+
+.card {
+    max-width: 100px;
+    max-height: 200px;
+}
+
+#login {
+    margin: auto;
+    max-width: 300px;
+}
+
+.inputText {
+    padding: 5px ;
+}
+
+.mode {
+    padding: 0 60px;
+}
+
+#difficultySettings {
+    margin-bottom: 10px;
+}
+
+.selectedCard {
+    border: 3px groove dimgrey;
+}
+
+#goButton {
+    width: 210px;
+}
