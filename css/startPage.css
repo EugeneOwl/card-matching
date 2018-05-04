@@ -23,6 +23,12 @@ html, body {
     text-indent: 40px;
 }
 
+#watchScoreButton {
+    position: absolute;
+    top: 165px;
+    left: 550px;
+}
+
 .card {
     max-width: 100px;
     max-height: 200px;
