@@ -1,5 +1,28 @@
 .backButton {
     position: absolute;
-    top: 50px;
+    top: 15px;
     left: 700px;
+}
+
+#cardTable {
+    margin: auto;
+    padding: 20px;
+}
+
+#cardTable td {
+    width: 80px;
+    height: 115px;
+    text-align: center;
+    font-size: 30px;
+    font-style: italic;
+    color: dimgrey;
+}
+
+#cardTable td img {
+    width: 80px;
+    height: 105px;
+}
+
+.invisible {
+    display: none;
 }

@@ -1,18 +1,24 @@
 (function base() {
 
+    let fields = {
+        1:[3,2],
+        2:[3,3],
+        3:[3,4]
+    };
+
     let headerBlock = document.getElementById("header");
     let contentBlock = document.getElementById("content");
     let bastionBlock = document.getElementById("bastion");
+    showStartPage();
+    reactStartPage();
 
-    (function showStartPage() {
-        window.showStartPage = showStartPage;
+    function showStartPage() {
 
         showStartWrapper(contentBlock);
         showStartHeader(headerBlock);
         showStartRules(bastionBlock);
         showScoreBlock(bastionBlock);
         showFormPanel(bastionBlock);
-        setSubmitReaction();
 
 
         function showStartWrapper(block) {
@@ -135,14 +141,19 @@
             let difficultySettingsDiv = document.createElement("div");
             difficultySettingsDiv.setAttribute("id", "difficultySettings");
 
-            let mode1radioBlock = getRadioModeBlock(1, "3 x 2 field");
+            /*let mode1radioBlock = getRadioModeBlock(1, fields[1][0] + " x " + fields[1][1] + " field");
             difficultySettingsDiv.appendChild(mode1radioBlock);
 
-            let mode2radioBlock = getRadioModeBlock(2, "3 x 3 field");
+            let mode2radioBlock = getRadioModeBlock(2, fields[2] + " field");
             difficultySettingsDiv.appendChild(mode2radioBlock);
 
-            let mode3radioBlock = getRadioModeBlock(3, "3 x 4 field");
-            difficultySettingsDiv.appendChild(mode3radioBlock);
+            let mode3radioBlock = getRadioModeBlock(3, fields[3] + " field");
+            difficultySettingsDiv.appendChild(mode3radioBlock);*/
+
+            for ((number) in fields) {
+                let modeRadioBlock = getRadioModeBlock(number, `${fields[number][0]} x ${fields[number][1]} field`);
+                difficultySettingsDiv.appendChild(modeRadioBlock);
+            }
 
             return difficultySettingsDiv;
         }
@@ -204,57 +215,63 @@
             return element;
         }
         window.getElement = getElement;
-    }) ();
+    }
 
-    (function reactStartPage() {
-        (function setCardModesChangingReaction() {
-            base.images.forEach( (image, number, arr) => {
+    function reactStartPage() {
+
+        setCardModesChangingReaction();
+        findOutCurrentImageMode();
+        setFieldModeChangingReaction();
+        setSubmitReaction();
+
+        function setCardModesChangingReaction() {
+            base.images.forEach((image, number, arr) => {
                 arr[number].onclick = () => {
                     arr = unselectAllImages(arr);
                     arr[number].classList.add("selectedCard");
                     base.findOutCurrentImageMode();
                 }
             });
-        }) ();
+        }
 
         function unselectAllImages(images) {
-            images.forEach( (image, number, arr) => {
+            images.forEach((image, number, arr) => {
                 arr[number].classList.remove("selectedCard");
             });
             return images;
         }
 
-        (function findOutCurrentImageMode() {
-            base.images.forEach( (image) => {
+        function findOutCurrentImageMode() {
+            base.images.forEach((image) => {
                 if (image.classList.contains("selectedCard")) {
                     base.currentImageMode = image.src;
                 }
             });
             base.findOutCurrentImageMode = findOutCurrentImageMode;
-        }) ();
-        
-        (function setFieldModeChangingReaction() {
-            base.modes.forEach( (radio, number, arr) => {
+        }
+
+        function setFieldModeChangingReaction() {
+            base.modes.forEach((radio, number, arr) => {
                 arr[number].onchange = () => {
                     base.fieldMode = arr[number].value;
                 }
             });
-        }) ();
+        }
 
         function setSubmitReaction() {
             base.goButton.onclick = () => {
                 let invalidFields = getInvalidFields({
-                    "Card mode":base.currentImageMode,
-                    "Name":base.nameInput.value,
-                    "Last name":base.lastnameInput.value,
-                    "Email":base.emailInput.value,
-                    "Field mode":base.fieldMode
+                    "Card mode": base.currentImageMode,
+                    "Name": base.nameInput.value,
+                    "Last name": base.lastnameInput.value,
+                    "Email": base.emailInput.value,
+                    "Field mode": base.fieldMode
                 });
-                invalidFields.forEach( (value) => {
+                invalidFields.forEach((value) => {
                     console.log(value);
                 });
                 //if (invalidFields.length === 0) {
-                    showGamePage(base.currentImageMode, base.fieldMode);
+                showGamePage(base.currentImageMode, base.fieldMode);
                 //}
             };
 
@@ -269,13 +286,26 @@
             }
 
         }
+    }
 
-    }) ();
+    function runStartPage() {
+        bastionBlock.innerHTML = "";
+        headerBlock.innerHTML = "";
+        showStartPage();
+        reactStartPage();
+    }
 
     function showGamePage(cardViewMode, fieldMode) {
+        timerStart();
         headerBlock.innerText = "Game";
         bastionBlock.innerHTML = "";
         showBackButton(bastionBlock);
+        showCardTable(bastionBlock, fieldMode);
+        setCardsReaction();
+        
+        function timerStart() {
+            base.startGame = new Date();
+        }
 
         function getBackBlock() {
             let backButtonDiv = getElement({tag:"div", id:"backBlock"});
@@ -286,9 +316,7 @@
                 value:"Back"
             });
             backButton.onclick = () => {
-                bastionBlock.innerHTML = "";
-                headerBlock.innerHTML = "";
-                showStartPage();
+                runStartPage();
             };
             backButtonDiv.appendChild(backButton);
             return backButtonDiv;
@@ -296,6 +324,104 @@
 
         function showBackButton(father) {
             father.appendChild(getBackBlock());
+        }
+
+        function showCardTable(father, fieldMode) {
+            let underCardValues = getUnderCardValues(fieldMode);
+            let cardTable = getCardTable(underCardValues, fieldMode);
+            father.appendChild(cardTable);
+        }
+
+        function getUnderCardValues(fieldMode) {
+            let couplesAmount = ( fields[fieldMode][0] * fields[fieldMode][1] ) / 2;
+            let underCardValues = [];
+            for (let number = 0; number < couplesAmount; number++) {
+                underCardValues.push(number, number);
+            }
+            return underCardValues.sort(compareRandom);
+
+            function compareRandom(a, b) {
+                return Math.random() - 0.5;
+            }
+        }
+
+        function getCardTable(values, fieldMode) {
+            let table = getElement({tag:"table", id:"cardTable"});
+            let currentValueNumber = 0;
+            base.cells = [];
+            for (let rowNumber = 0; rowNumber < fields[fieldMode][0]; rowNumber++) {
+                let row = getElement({tag:"tr"});
+                for (let cellNumber = 0; cellNumber < fields[fieldMode][1]; cellNumber++) {
+                    let cell = getCardTableCell(values[currentValueNumber]);
+                    row.appendChild(cell);
+                    currentValueNumber++;
+                }
+                table.appendChild(row);
+            }
+            return table;
+
+            function getCardTableCell(value) {
+                let cell = getElement({tag:"td"});
+                let valueSpan = getElement({tag:"span"});
+                valueSpan.innerText = value;
+                valueSpan.classList.add("invisible");
+                let image = getElement({tag:"img", src:base.currentImageMode});
+                cell.appendChild(valueSpan);
+                cell.appendChild(image);
+                base.cells.push(cell);
+                return cell;
+            }
+        }
+
+        function setCardsReaction() {
+            base.cells.forEach( (cell) => {
+                cell.onclick = () => {
+                    if (base.firstCard === undefined) {
+                        base.firstCard = cell;
+                        base.firstCard = showCard(base.firstCard);
+                    } else {
+                        cell = showCard(cell);
+                        sleep(300).then(() => {
+                            if (base.firstCard.innerText === cell.innerText) {
+                                checkEoG();
+                            } else {
+                                base.firstCard = hideCard(base.firstCard);
+                                cell = hideCard(cell);
+                            }
+                            base.firstCard = undefined;
+                        });
+                    }
+
+                }
+            });
+            function sleep (time) {
+                return new Promise((resolve) => setTimeout(resolve, time));
+            }
+        }
+
+        function checkEoG() {
+            let readyOnesAmount = 0;
+            base.cells.forEach( (cell) => {
+                if (cell.childNodes[1].classList.contains("invisible")) {
+                    readyOnesAmount++;
+                }
+            });
+            if (readyOnesAmount === base.cells.length) {
+                alert("EoG");
+                runStartPage();
+            }
+        }
+
+        function hideCard(cell) {
+            cell.childNodes[0].classList.add("invisible");
+            cell.childNodes[1].classList.remove("invisible");
+            return cell;
+        }
+
+        function showCard(cell) {
+            cell.childNodes[1].classList.add("invisible");
+            cell.childNodes[0].classList.remove("invisible");
+            return cell;
         }
     }
 
