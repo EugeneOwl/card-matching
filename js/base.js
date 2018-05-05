@@ -1,19 +1,18 @@
-(function () {
+(function base() {
 
     let headerBlock = document.getElementById("header");
     let contentBlock = document.getElementById("content");
     let bastionBlock = document.getElementById("bastion");
 
     (function showStartPage() {
+        window.showStartPage = showStartPage;
+
         showStartWrapper(contentBlock);
         showStartHeader(headerBlock);
         showStartRules(bastionBlock);
-
-        let scoreButton = getScoreButton();
-        showScoreButton(scoreButton, bastionBlock);
-        
-        let loginForm = getLoginForm();
-
+        showScoreBlock(bastionBlock);
+        showFormPanel(bastionBlock);
+        setSubmitReaction();
 
 
         function showStartWrapper(block) {
@@ -41,97 +40,263 @@
                 "printer took a galley of type and scrambled it to make a type specimen book."
         }
 
-        function getScoreButton() {
-            let scoreButton = document.createElement("input");
-            scoreButton.setAttribute("type", "button");
-            scoreButton.setAttribute("value", "Watch score");
-            return scoreButton;
+        function getScoreBlock() {
+            let scoreButtonDiv = getElement({tag:"div", id:"watchScoreButton"});
+            let scoreButton = getElement({
+                tag:"input",
+                type:"button",
+                value:"Watch score"
+            });
+            base.scoreButton = scoreButton;
+            scoreButtonDiv.appendChild(scoreButton);
+            return scoreButtonDiv;
         }
 
-        function showScoreButton(button, father) {
-            let div = document.createElement("div");
-            div.setAttribute("id", "watchScoreButton");
-            div.appendChild(button);
-            father.appendChild(div);
-        }
-        
-        function getLoginForm() {
-            let loginDiv = getLoginDiv();
-
-            console.log(loginDiv);
+        function showScoreBlock(father) {
+            father.appendChild(getScoreBlock());
         }
 
-        function getLoginDiv() {
+        function getLoginPanel() {
             let loginDiv = document.createElement("div");
             loginDiv.setAttribute("id", "login");
-            let form = getForm();
+            let form = getInputForm();
             loginDiv.appendChild(form);
             return loginDiv;
         }
 
-        function getForm() {
+        function getInputForm() {
             let form = document.createElement("form");
+            
             let textInput = getTextInput();
-
+            let difficultySetting = getDifficultySetting();
+            let viewSetting = getViewSetting();
+            let goButton = getElement({
+               tag:"input",
+               type:"button",
+               id:"goButton",
+               value:"Go!"
+            });
+            base.goButton = goButton;
+            
             form.appendChild(textInput);
+            form.appendChild(difficultySetting);
+            form.appendChild(viewSetting);
+            form.appendChild(goButton);
             return form;
         }
         
         function getTextInput() {
             let textInputDiv = document.createElement("div");
             textInputDiv.classList.add("textInput");
+            let divClass = "inputText";
 
-            let nameInputBlock = getNameInputBlock();
+            let nameInput = getElement({
+                tag:"input",
+                type:"text",
+                placeholder:"name",
+                id:"name"
+            });
+            base.nameInput = nameInput;
+            let nameInputBlock = getInputBlock(divClass, nameInput);
             textInputDiv.appendChild(nameInputBlock);
 
-            let lastNameInputBlock = getLastNameInputBlock();
+            let lastnameInput = getElement({
+                tag:"input",
+                type:"text",
+                placeholder:"last name",
+                id:"lastname"
+            });
+            base.lastnameInput = lastnameInput;
+            let lastNameInputBlock = getInputBlock(divClass, lastnameInput);
             textInputDiv.appendChild(lastNameInputBlock);
 
-            let emailInputBlock = getEmailInputBlock();
+            let emailInput =  getElement({
+                    tag:"input",
+                    type:"email",
+                    placeholder:"email",
+                    id:"email"
+            });
+            base.emailInput = emailInput;
+            let emailInputBlock = getInputBlock(divClass, emailInput);
             textInputDiv.appendChild(emailInputBlock);
             
             return textInputDiv;
         }
+
+        function getInputBlock(divClass, inputElement) {
+            let inputDiv = document.createElement("div");
+            inputDiv.classList.add(divClass);
+            inputDiv.appendChild(inputElement);
+
+            return inputDiv;
+        }
         
-        function getNameInputBlock() {
-            let nameInputDiv = document.createElement("div");
-            nameInputDiv.classList.add("inputText");
+        function getDifficultySetting() {
+            let difficultySettingsDiv = document.createElement("div");
+            difficultySettingsDiv.setAttribute("id", "difficultySettings");
 
-            let nameInput = getInput("text", "name", "name");
-            nameInputDiv.appendChild(nameInput);
+            let mode1radioBlock = getRadioModeBlock(1, "3 x 2 field");
+            difficultySettingsDiv.appendChild(mode1radioBlock);
 
-            return nameInputDiv;
+            let mode2radioBlock = getRadioModeBlock(2, "3 x 3 field");
+            difficultySettingsDiv.appendChild(mode2radioBlock);
+
+            let mode3radioBlock = getRadioModeBlock(3, "3 x 4 field");
+            difficultySettingsDiv.appendChild(mode3radioBlock);
+
+            return difficultySettingsDiv;
         }
 
-        function getLastNameInputBlock() {
-            let lastNameInputDiv = document.createElement("div");
-            lastNameInputDiv.classList.add("inputText");
+        function getRadioModeBlock(mode, labelText) {
+            let radioDiv = document.createElement("div");
+            radioDiv.classList.add("mode");
 
-            let lastNameInput = getInput("text", "last name", "lastname");
-            lastNameInputDiv.appendChild(lastNameInput);
+            let label = document.createElement("label");
+            label.innerText = labelText;
 
-            return lastNameInputDiv;
+            let input = getElement({
+                tag:"input",
+                type:"radio",
+                name:"mode",
+                value:mode,
+            });
+            if (base.modes === undefined) {
+                base.modes = [];
+            }
+            base.modes.push(input);
+
+            label.appendChild(input);
+            radioDiv.appendChild(label);
+            return radioDiv;
+        }
+        
+        function getViewSetting() {
+            let ViewSettingDiv = document.createElement("div");
+            ViewSettingDiv.setAttribute("id", "viewSetting");
+
+            let img1 = getElement({
+                               tag:"img",
+                               src:"images/card1.jpg",
+                               class:"card selectedCard"
+                           });
+            let img2 = getElement({
+                               tag:"img",
+                               src:"images/card2.jpg",
+                               class:"card"
+                           });
+            base.images = [img1, img2];
+            ViewSettingDiv.appendChild(base.images[0]);
+            ViewSettingDiv.appendChild(base.images[1]);
+            return ViewSettingDiv;
         }
 
-        function getEmailInputBlock() {
-            let emailInputDiv = document.createElement("div");
-            emailInputDiv.classList.add("inputText");
-
-            let emailInput = getInput("email", "email", "email");
-            emailInputDiv.appendChild(emailInput);
-
-            return emailInputDiv;
+        function showFormPanel(father) {
+            father.appendChild(getLoginPanel());
         }
 
-
-
-        function getInput(type, placeholder, id) {
-            let lastNameInput = document.createElement("input");
-            lastNameInput.setAttribute("type", type);
-            lastNameInput.setAttribute("placeholder", placeholder);
-            lastNameInput.setAttribute("id", id);
-            return lastNameInput;
+        function getElement(qualities) {
+            let element = document.createElement(qualities.tag);
+            for (key in qualities) {
+                if (key !== "tag") {
+                    element.setAttribute(key, qualities[key]);
+                }
+            }
+            return element;
         }
+        window.getElement = getElement;
     }) ();
+
+    (function reactStartPage() {
+        (function setCardModesChangingReaction() {
+            base.images.forEach( (image, number, arr) => {
+                arr[number].onclick = () => {
+                    arr = unselectAllImages(arr);
+                    arr[number].classList.add("selectedCard");
+                    base.findOutCurrentImageMode();
+                }
+            });
+        }) ();
+
+        function unselectAllImages(images) {
+            images.forEach( (image, number, arr) => {
+                arr[number].classList.remove("selectedCard");
+            });
+            return images;
+        }
+
+        (function findOutCurrentImageMode() {
+            base.images.forEach( (image) => {
+                if (image.classList.contains("selectedCard")) {
+                    base.currentImageMode = image.src;
+                }
+            });
+            base.findOutCurrentImageMode = findOutCurrentImageMode;
+        }) ();
+        
+        (function setFieldModeChangingReaction() {
+            base.modes.forEach( (radio, number, arr) => {
+                arr[number].onchange = () => {
+                    base.fieldMode = arr[number].value;
+                }
+            });
+        }) ();
+
+        function setSubmitReaction() {
+            base.goButton.onclick = () => {
+                let invalidFields = getInvalidFields({
+                    "Card mode":base.currentImageMode,
+                    "Name":base.nameInput.value,
+                    "Last name":base.lastnameInput.value,
+                    "Email":base.emailInput.value,
+                    "Field mode":base.fieldMode
+                });
+                invalidFields.forEach( (value) => {
+                    console.log(value);
+                });
+                //if (invalidFields.length === 0) {
+                    showGamePage(base.currentImageMode, base.fieldMode);
+                //}
+            };
+
+            function getInvalidFields(fields) {
+                let invalidFields = [];
+                for (key in fields) {
+                    if (!fields[key]) {
+                        invalidFields.push(key);
+                    }
+                }
+                return invalidFields;
+            }
+
+        }
+
+    }) ();
+
+    function showGamePage(cardViewMode, fieldMode) {
+        headerBlock.innerText = "Game";
+        bastionBlock.innerHTML = "";
+        showBackButton(bastionBlock);
+
+        function getBackBlock() {
+            let backButtonDiv = getElement({tag:"div", id:"backBlock"});
+            backButtonDiv.classList.add("backButton");
+            let backButton = getElement({
+                tag:"input",
+                type:"button",
+                value:"Back"
+            });
+            backButton.onclick = () => {
+                bastionBlock.innerHTML = "";
+                headerBlock.innerHTML = "";
+                showStartPage();
+            };
+            backButtonDiv.appendChild(backButton);
+            return backButtonDiv;
+        }
+
+        function showBackButton(father) {
+            father.appendChild(getBackBlock());
+        }
+    }
 
 }) ();
