@@ -307,6 +307,14 @@
             base.startGame = new Date();
         }
 
+        function timerStop() {
+            base.finishGame = new Date();
+        }
+
+        function getGameTime() {
+            return (base.finishGame.getTime() - base.startGame.getTime()) / 1000;
+        }
+
         function getBackBlock() {
             let backButtonDiv = getElement({tag:"div", id:"backBlock"});
             backButtonDiv.classList.add("backButton");
@@ -381,7 +389,7 @@
                         base.firstCard = showCard(base.firstCard);
                     } else {
                         cell = showCard(cell);
-                        sleep(300).then(() => {
+                        sleep(200).then(() => {
                             if (base.firstCard.innerText === cell.innerText) {
                                 checkEoG();
                             } else {
@@ -407,7 +415,10 @@
                 }
             });
             if (readyOnesAmount === base.cells.length) {
-                alert("EoG");
+                timerStop();
+                let time = getGameTime();
+                alert(`${time} sec`);
+                recognizeResult(time);
                 runStartPage();
             }
         }
@@ -422,6 +433,22 @@
             cell.childNodes[1].classList.add("invisible");
             cell.childNodes[0].classList.remove("invisible");
             return cell;
+        }
+
+        function recognizeResult(time) {
+            let result = {
+                name:base.nameInput.value,
+                lastname:base.lastnameInput.value,
+                email:base.emailInput.value,
+                time:time
+            };
+            let results;
+            if (results = JSON.parse(localStorage.getItem("results"))) {
+                alert("Results exist in local storage.");
+            } else {
+                alert("Results DO NOT exist in local storage.");
+                localStorage.setItem("results", []);
+            }
         }
     }
 
