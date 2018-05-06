@@ -375,9 +375,6 @@
 
                 }
             });
-            function sleep (time) {
-                return new Promise((resolve) => setTimeout(resolve, time));
-            }
         }
 
         function checkEoG() {
@@ -438,6 +435,10 @@
                 return 0;
             }
         }
+    }
+
+    function sleep (time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
     }
 
     function showBackButton(father) {
