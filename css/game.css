@@ -1,7 +1,5 @@
 .backButton {
-    position: absolute;
-    top: 15px;
-    left: 700px;
+    margin-left: 600px;
 }
 
 #cardTable {
