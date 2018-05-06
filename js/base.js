@@ -1,29 +1,23 @@
 (function base() {
-
     let fields = {
         1:[3,2],
-        2:[3,3],
+        2:[2,4],
         3:[3,4]
     };
+    let top = 10;
+    let sleepPeriod = 100;
 
     let headerBlock = document.getElementById("header");
-    let contentBlock = document.getElementById("content");
     let bastionBlock = document.getElementById("bastion");
     showStartPage();
     reactStartPage();
 
     function showStartPage() {
 
-        showStartWrapper(contentBlock);
         showStartHeader(headerBlock);
         showStartRules(bastionBlock);
         showScoreBlock(bastionBlock);
         showFormPanel(bastionBlock);
-
-
-        function showStartWrapper(block) {
-            block.classList.add("wrapper");
-        }
 
         function showStartHeader(father) {
             let headerTag = document.createElement("div");
@@ -141,15 +135,6 @@
             let difficultySettingsDiv = document.createElement("div");
             difficultySettingsDiv.setAttribute("id", "difficultySettings");
 
-            /*let mode1radioBlock = getRadioModeBlock(1, fields[1][0] + " x " + fields[1][1] + " field");
-            difficultySettingsDiv.appendChild(mode1radioBlock);
-
-            let mode2radioBlock = getRadioModeBlock(2, fields[2] + " field");
-            difficultySettingsDiv.appendChild(mode2radioBlock);
-
-            let mode3radioBlock = getRadioModeBlock(3, fields[3] + " field");
-            difficultySettingsDiv.appendChild(mode3radioBlock);*/
-
             for ((number) in fields) {
                 let modeRadioBlock = getRadioModeBlock(number, `${fields[number][0]} x ${fields[number][1]} field`);
                 difficultySettingsDiv.appendChild(modeRadioBlock);
@@ -223,6 +208,7 @@
         findOutCurrentImageMode();
         setFieldModeChangingReaction();
         setSubmitReaction();
+        setWatchResultsReaction();
 
         function setCardModesChangingReaction() {
             base.images.forEach((image, number, arr) => {
@@ -268,11 +254,11 @@
                     "Field mode": base.fieldMode
                 });
                 invalidFields.forEach((value) => {
-                    console.log(value);
+                    alert(`${value} is not valid.`);
                 });
-                //if (invalidFields.length === 0) {
-                showGamePage(base.currentImageMode, base.fieldMode);
-                //}
+                if (invalidFields.length === 0) {
+                    showGamePage(base.currentImageMode, base.fieldMode);
+                }
             };
 
             function getInvalidFields(fields) {
@@ -285,6 +271,12 @@
                 return invalidFields;
             }
 
+        }
+
+        function setWatchResultsReaction() {
+            base.scoreButton.onclick = () => {
+                runResultsPage();
+            }
         }
     }
 
@@ -313,25 +305,6 @@
 
         function getGameTime() {
             return (base.finishGame.getTime() - base.startGame.getTime()) / 1000;
-        }
-
-        function getBackBlock() {
-            let backButtonDiv = getElement({tag:"div", id:"backBlock"});
-            backButtonDiv.classList.add("backButton");
-            let backButton = getElement({
-                tag:"input",
-                type:"button",
-                value:"Back"
-            });
-            backButton.onclick = () => {
-                runStartPage();
-            };
-            backButtonDiv.appendChild(backButton);
-            return backButtonDiv;
-        }
-
-        function showBackButton(father) {
-            father.appendChild(getBackBlock());
         }
 
         function showCardTable(father, fieldMode) {
@@ -389,7 +362,7 @@
                         base.firstCard = showCard(base.firstCard);
                     } else {
                         cell = showCard(cell);
-                        sleep(200).then(() => {
+                        sleep(sleepPeriod).then(() => {
                             if (base.firstCard.innerText === cell.innerText) {
                                 checkEoG();
                             } else {
@@ -436,20 +409,109 @@
         }
 
         function recognizeResult(time) {
-            let result = {
+            let resultObject = {
                 name:base.nameInput.value,
                 lastname:base.lastnameInput.value,
                 email:base.emailInput.value,
                 time:time
             };
-            let results;
-            if (results = JSON.parse(localStorage.getItem("results"))) {
-                alert("Results exist in local storage.");
+
+            let resultsArray = JSON.parse(localStorage.getItem("results"));
+            if (resultsArray) {
+                resultsArray.push(resultObject);
             } else {
-                alert("Results DO NOT exist in local storage.");
-                localStorage.setItem("results", []);
+                resultsArray = [resultObject];
+            }
+            resultsArray = prepareTop(resultsArray, top);
+            localStorage.setItem("results", JSON.stringify(resultsArray));
+        }
+
+        function prepareTop(results, n) {
+            results.sort(compareResults);
+            return results.splice(0,  n);
+
+            function compareResults(a, b) {
+                if (a.time < b.time)
+                    return -1;
+                if (a.time > b.time)
+                    return 1;
+                return 0;
             }
         }
     }
 
+    function showBackButton(father) {
+        father.appendChild(getBackBlock());
+    }
+
+    function getBackBlock() {
+        let backButtonDiv = getElement({tag:"div", id:"backBlock"});
+        backButtonDiv.classList.add("backButton");
+        let backButton = getElement({
+            tag:"input",
+            type:"button",
+            value:"Back"
+        });
+        backButton.onclick = () => {
+            runStartPage();
+        };
+        backButtonDiv.appendChild(backButton);
+        return backButtonDiv;
+    }
+
+    function runResultsPage() {
+        bastionBlock.innerHTML = "";
+        headerBlock.innerHTML = "";
+        showResultsPage();
+    }
+
+    function showResultsPage() {
+        headerBlock.innerText = "Score";
+        bastionBlock.innerHTML = "";
+        showBackButton(bastionBlock);
+        showScoreTable(bastionBlock);
+    }
+
+    function showScoreTable(father) {
+        father.appendChild(getScoreTable());
+    }
+    
+    function getScoreTable() {
+        let table = getElement({tag:"table", id:"score"});
+        table.appendChild(getHeaderRow());
+        let results = JSON.parse(localStorage.getItem("results"));
+        if (results) {
+            results.forEach( (result) => {
+                table.appendChild(getDataRow(result));
+            });
+        }
+        return table;
+
+        function getHeaderRow() {
+            let headerRow = getElement({tag:"tr"});
+            let nameHeader = getElement({tag:"th"});
+            nameHeader.innerText = "Last name";
+            let lastNameHeader = getElement({tag:"th"});
+            lastNameHeader.innerText = "Last name";
+            let emailHeader = getElement({tag:"th"});
+            emailHeader.innerText = "Email";
+            let timeHeader = getElement({tag:"th"});
+            timeHeader.innerText = "Name";
+            headerRow.appendChild(nameHeader);
+            headerRow.appendChild(lastNameHeader);
+            headerRow.appendChild(emailHeader);
+            headerRow.appendChild(timeHeader);
+            return headerRow;
+        }
+
+        function getDataRow(fields) {
+            let dataRow = getElement({tag:"tr"});
+            for (let key in fields) {
+                let dataCell = getElement({tag:"td"});
+                dataCell.innerText = fields[key];
+                dataRow.appendChild(dataCell);
+            }
+            return dataRow;
+        }
+    }
 }) ();

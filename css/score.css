@@ -1,0 +1,17 @@
+#score {
+    border: 2px solid black;
+    margin: auto;
+    margin-top: 30px;
+    min-width: 500px;
+    max-width: 600px;
+    border-spacing: 0;
+}
+
+#score td {
+    border: 1px solid black;
+    background-color: #F3F2DF;
+}
+
+#score th {
+    text-align: left;
+}
