@@ -1,23 +1,23 @@
 (function base() {
-    let fields = {
+    base.fields = {
         1:[3,2],
         2:[2,4],
         3:[3,4]
     };
-    let top = 10;
-    let sleepPeriod = 100;
+    base.top = 10;
+    base.sleepPeriod = 100;
 
-    let headerBlock = document.getElementById("header");
-    let bastionBlock = document.getElementById("bastion");
+    base.headerBlock = document.getElementById("header");
+    base.bastionBlock = document.getElementById("bastion");
     showStartPage();
     reactStartPage();
 
     function showStartPage() {
 
-        showStartHeader(headerBlock);
-        showStartRules(bastionBlock);
-        showScoreBlock(bastionBlock);
-        showFormPanel(bastionBlock);
+        showStartHeader(base.headerBlock);
+        showStartRules(base.bastionBlock);
+        showScoreBlock(base.bastionBlock);
+        showFormPanel(base.bastionBlock);
 
         function showStartHeader(father) {
             let headerTag = document.createElement("div");
@@ -135,8 +135,8 @@
             let difficultySettingsDiv = document.createElement("div");
             difficultySettingsDiv.setAttribute("id", "difficultySettings");
 
-            for ((number) in fields) {
-                let modeRadioBlock = getRadioModeBlock(number, `${fields[number][0]} x ${fields[number][1]} field`);
+            for ((number) in base.fields) {
+                let modeRadioBlock = getRadioModeBlock(number, `${base.fields[number][0]} x ${base.fields[number][1]} field`);
                 difficultySettingsDiv.appendChild(modeRadioBlock);
             }
 
@@ -246,6 +246,10 @@
 
         function setSubmitReaction() {
             base.goButton.onclick = () => {
+                base.nameInput.classList.remove("invalid");
+                base.lastnameInput.classList.remove("invalid");
+                base.emailInput.classList.remove("invalid");
+                document.getElementById("difficultySettings").classList.remove("invalid");
                 let invalidFields = getInvalidFields({
                     "Card mode": base.currentImageMode,
                     "Name": base.nameInput.value,
@@ -253,18 +257,38 @@
                     "Email": base.emailInput.value,
                     "Field mode": base.fieldMode
                 });
-                invalidFields.forEach((value) => {
-                    alert(`${value} is not valid.`);
+                if (!validateEmail(base.emailInput.value)) {
+                    invalidFields.push("Email");
+                }
+                invalidFields.forEach((value, key) => {
+                    //alert(`${value} is not valid.`);
+                    if (value === "Name") {
+                        base.nameInput.classList.add("invalid");
+                    }
+                    if (value === "Last name") {
+                        base.lastnameInput.classList.add("invalid");
+                    }
+                    if (value === "Email") {
+                        base.emailInput.classList.add("invalid");
+                    }
+                    if (value === "Field mode") {
+                        document.getElementById("difficultySettings").classList.add("invalid");
+                    }
                 });
                 if (invalidFields.length === 0) {
                     showGamePage(base.currentImageMode, base.fieldMode);
                 }
             };
 
+            function validateEmail(email) {
+                let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(String(email).toLowerCase());
+            }
+
             function getInvalidFields(fields) {
                 let invalidFields = [];
-                for (key in fields) {
-                    if (!fields[key]) {
+                for (key in base.fields) {
+                    if (!base.fields[key]) {
                         invalidFields.push(key);
                     }
                 }
@@ -281,18 +305,18 @@
     }
 
     function runStartPage() {
-        bastionBlock.innerHTML = "";
-        headerBlock.innerHTML = "";
+        base.bastionBlock.innerHTML = "";
+        base.headerBlock.innerHTML = "";
         showStartPage();
         reactStartPage();
     }
 
     function showGamePage(cardViewMode, fieldMode) {
         timerStart();
-        headerBlock.innerText = "Game";
-        bastionBlock.innerHTML = "";
-        showBackButton(bastionBlock);
-        showCardTable(bastionBlock, fieldMode);
+        base.headerBlock.innerText = "Game";
+        base.bastionBlock.innerHTML = "";
+        showBackButton(base.bastionBlock);
+        showCardTable(base.bastionBlock, fieldMode);
         setCardsReaction();
         
         function timerStart() {
@@ -314,7 +338,7 @@
         }
 
         function getUnderCardValues(fieldMode) {
-            let couplesAmount = ( fields[fieldMode][0] * fields[fieldMode][1] ) / 2;
+            let couplesAmount = ( base.fields[fieldMode][0] * base.fields[fieldMode][1] ) / 2;
             let underCardValues = [];
             for (let number = 0; number < couplesAmount; number++) {
                 underCardValues.push(number, number);
@@ -330,9 +354,9 @@
             let table = getElement({tag:"table", id:"cardTable"});
             let currentValueNumber = 0;
             base.cells = [];
-            for (let rowNumber = 0; rowNumber < fields[fieldMode][0]; rowNumber++) {
+            for (let rowNumber = 0; rowNumber < base.fields[fieldMode][0]; rowNumber++) {
                 let row = getElement({tag:"tr"});
-                for (let cellNumber = 0; cellNumber < fields[fieldMode][1]; cellNumber++) {
+                for (let cellNumber = 0; cellNumber < base.fields[fieldMode][1]; cellNumber++) {
                     let cell = getCardTableCell(values[currentValueNumber]);
                     row.appendChild(cell);
                     currentValueNumber++;
@@ -362,7 +386,7 @@
                         base.firstCard = showCard(base.firstCard);
                     } else {
                         cell = showCard(cell);
-                        sleep(sleepPeriod).then(() => {
+                        sleep(base.sleepPeriod).then(() => {
                             if (base.firstCard.innerText === cell.innerText) {
                                 checkEoG();
                             } else {
@@ -419,7 +443,7 @@
             } else {
                 resultsArray = [resultObject];
             }
-            resultsArray = prepareTop(resultsArray, top);
+            resultsArray = prepareTop(resultsArray, base.top);
             localStorage.setItem("results", JSON.stringify(resultsArray));
         }
 
@@ -461,16 +485,16 @@
     }
 
     function runResultsPage() {
-        bastionBlock.innerHTML = "";
-        headerBlock.innerHTML = "";
+        base.bastionBlock.innerHTML = "";
+        base.headerBlock.innerHTML = "";
         showResultsPage();
     }
 
     function showResultsPage() {
-        headerBlock.innerText = "Score";
-        bastionBlock.innerHTML = "";
-        showBackButton(bastionBlock);
-        showScoreTable(bastionBlock);
+        base.headerBlock.innerText = "Score";
+        base.bastionBlock.innerHTML = "";
+        showBackButton(base.bastionBlock);
+        showScoreTable(base.bastionBlock);
     }
 
     function showScoreTable(father) {
@@ -507,7 +531,7 @@
 
         function getDataRow(fields) {
             let dataRow = getElement({tag:"tr"});
-            for (let key in fields) {
+            for (let key in base.fields) {
                 let dataCell = getElement({tag:"td"});
                 dataCell.innerText = fields[key];
                 dataRow.appendChild(dataCell);
@@ -516,3 +540,4 @@
         }
     }
 }) ();
+

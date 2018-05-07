@@ -56,3 +56,7 @@ html, body {
 #goButton {
     width: 210px;
 }
+
+.invalid {
+    border: 2px solid red;
+}
