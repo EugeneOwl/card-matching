@@ -1,3 +1,0 @@
- function baseAlert() {
-        alert("base");
-}
