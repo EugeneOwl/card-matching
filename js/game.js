@@ -29,7 +29,8 @@ function showGamePage(cardViewMode, fieldMode) {
         let couplesAmount = ( fields[fieldMode][0] * fields[fieldMode][1] ) / 2;
         let underCardValues = [];
         for (let number = 0; number < couplesAmount; number++) {
-            underCardValues.push(number, number);
+            let path = `images/${number}.jpeg`;
+            underCardValues.push(path, path);
         }
         return underCardValues.sort(compareRandom);
 
@@ -56,7 +57,8 @@ function showGamePage(cardViewMode, fieldMode) {
         function getCardTableCell(value) {
             let cell = getElement({tag:"td"});
             let valueSpan = getElement({tag:"span"});
-            valueSpan.innerText = value;
+            let cardImg = getElement({tag:"img", src:value});
+            valueSpan.appendChild(cardImg);
             valueSpan.classList.add("invisible");
             let image = getElement({tag:"img", src:currentImageMode});
             cell.appendChild(valueSpan);
@@ -75,7 +77,7 @@ function showGamePage(cardViewMode, fieldMode) {
                 } else {
                     cell = showCard(cell);
                     sleep(sleepPeriod).then(() => {
-                        if (firstCard.innerText === cell.innerText) {
+                        if (firstCard.childNodes[0].childNodes[0].src === cell.childNodes[0].childNodes[0].src) {
                             checkEoG();
                         } else {
                             firstCard = hideCard(firstCard);
